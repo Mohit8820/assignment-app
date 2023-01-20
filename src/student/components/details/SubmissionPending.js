@@ -144,6 +144,8 @@ const SubmissionPending = (props) => {
     if (text !== null) formData.append("text", text);
 
     var submit = "/submit";
+    var url = "https://assignment-backend-tutedude.herokuapp.com";
+    var method = "POST";
     if (question.status === "completed") {
       let sub;
       if (question.submissions)
@@ -153,14 +155,24 @@ const SubmissionPending = (props) => {
       formData.append("attempt", sub.attempt + 1);
       submit = "/resubmit";
     }
+    if (question.status === "submitted") {
+      let sub;
+      if (question.submissions)
+        sub = question.submissions[question.submissions.length - 1];
+      else sub = null;
+      formData.append("submission_id", question.submission_id);
+      formData.append("list_id", sub._id);
+      submit = "/submission";
+      method = "PUT";
+    }
 
     for (var key of formData.entries()) {
       console.log(key[0]);
       console.log(key[1]);
     }
-    const url = "https://assignment-backend-tutedude.herokuapp.com";
+
     let a = await fetch(url + submit, {
-      method: "POST",
+      method: method,
       body: formData,
     })
       .then((response) => response.json())
@@ -306,7 +318,6 @@ const SubmissionPending = (props) => {
   function viewSolutionButtonHandler() {
     props.changeSec();
   }
-
   return (
     <div className="sub-pending-sec">
       <Modal
@@ -414,7 +425,7 @@ const SubmissionPending = (props) => {
                     ))}
                   </>
                 )}
-                {sub !== null && sub.text && (
+                {sub !== null && sub.text && sub.text !== "" && (
                   <div className="white-area-element">
                     <span>{sub.text.slice(0, 20)}</span>
                     <section>
@@ -433,7 +444,7 @@ const SubmissionPending = (props) => {
                         >
                           <path
                             d="m22 5c0-.478-.379-1-1-1h-18c-.62 0-1 .519-1 1v14c0 .621.52 1 1 1h18c.478 0 1-.379 1-1zm-1.5 13.5h-17v-13h17zm-6.065-9.978-5.917 5.921v-1.243c0-.414-.336-.75-.75-.75-.415 0-.75.336-.75.75v3.05c0 .414.335.75.75.75h3.033c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-1.219l5.918-5.922v1.244c0 .414.336.75.75.75s.75-.336.75-.75c0-.715 0-2.335 0-3.05 0-.414-.336-.75-.75-.75-.715 0-2.318 0-3.033 0-.414 0-.75.336-.75.75s.336.75.75.75z"
-                            fill-rule="nonzero"
+                            fillRule="nonzero"
                           />
                         </svg>
                       </span>
@@ -485,8 +496,8 @@ const SubmissionPending = (props) => {
                                 setModalType("delete");
                                 setDeleteLink((prev) => ({
                                   ...prev,
-                                  ltext: sub.linkText,
-                                  flink: l,
+                                  ltext: sub.linkText[index],
+                                  link: l,
                                   index: index,
                                 }));
                                 setDeleteType("link");
@@ -579,7 +590,9 @@ const SubmissionPending = (props) => {
                   type="submit"
                   className="submit-solution"
                   disabled={
-                    files.length === 0 && text === null && links.length === 0
+                    files.length === 0 &&
+                    (text === null || text === "") &&
+                    links.length === 0
                       ? true
                       : false
                   }

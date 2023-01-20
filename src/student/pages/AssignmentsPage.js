@@ -2,11 +2,12 @@ import React, { useEffect, useState, useContext } from "react";
 import $ from "jquery";
 
 import AssignmentList from "../components/AssignmentList";
-import GlobalState from "../../contexts/GlobalState";
+//import GlobalState from "../../contexts/GlobalState";
 import "./AssignmentPage.css";
 
-const AssignmestsPage = () => {
-  const [ids, setIds] = useContext(GlobalState);
+const AssignmestsPage = (props) => {
+  //const [ids, setIds] = useContext(GlobalState);
+  const ids = props.ids;
   console.log(ids);
 
   //const domain=http://tutedude.herokuapp.com

@@ -18,8 +18,6 @@ const App = () => {
   const student_id = queryParams.get("student_id");
   const subject_id = queryParams.get("subject_id");
 
-  console.log(student_id);
-  console.log(subject_id);
   const [ids, setIds] = useState({
     student_id: student_id,
     subject_id: subject_id,
@@ -32,7 +30,7 @@ const App = () => {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/assignment" element={<AssignmentsPage />} />
+            <Route path="/assignment" element={<AssignmentsPage ids={ids} />} />
             <Route path="/mentor" element={<h3>mentor</h3>} />
             <Route path="*" element={<Navigate replace to="/assignment" />} />
           </Routes>

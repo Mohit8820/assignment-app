@@ -1,10 +1,11 @@
 import React, { useState, useContext } from "react";
 import "./modalElements.css";
 import GlobalState from "../../../../contexts/GlobalState";
+import $ from "jquery";
 
-function fakeRequest() {
-  return new Promise((resolve) => setTimeout(() => resolve(), 1000));
-}
+// function fakeRequest() {
+//   return new Promise((resolve) => setTimeout(() => resolve(), 1000));
+// }
 
 // /submission/file
 // /submission/link
@@ -14,11 +15,11 @@ function fakeRequest() {
 const Delete = (props) => {
   const [ids, setIds] = useContext(GlobalState);
   const [success, setSuccess] = useState(false);
-
   var question = props.question;
 
   console.log(question.submissions[question.submissions.length - 1]._id);
   async function deleteFile() {
+    var method = "DELETE";
     let formData = new FormData();
 
     const aid = 123;
@@ -37,11 +38,13 @@ const Delete = (props) => {
       formData.append("file_link", props.deleteFile.flink);
       formData.append("index", props.deleteFile.index);
     } else if (props.deleteType === "link") {
-      formData.append("link", props.deleteLink.ltext);
-      formData.append("link_text", props.deleteLink.link);
+      formData.append("link", props.deleteLink.link);
+      formData.append("link_text", props.deleteLink.ltext);
       formData.append("index", props.deleteLink.index);
     } else if (props.deleteType === "text") {
-      formData.append("text", props.deleteText);
+      //formData.append("text", props.deleteText);
+      method = "PUT";
+      formData.append("text", "");
     }
 
     for (var key of formData.entries()) {
@@ -50,7 +53,7 @@ const Delete = (props) => {
     }
     const url = "https://assignment-backend-tutedude.herokuapp.com/submission/";
     let a = await fetch(url + props.deleteType, {
-      method: "DELETE",
+      method: method,
       body: formData,
     })
       .then((response) => response.json())
@@ -58,21 +61,34 @@ const Delete = (props) => {
         console.log("data");
         console.log(data);
         if (data.success === true) {
+          console.log("success");
           setSuccess(true);
+          //fakeRequest().then(() => {
+          props.close();
+          //  });
         } else {
           alert("error");
         }
       });
     //props.sendData();
+    /* $.ajax({
+      url: url + props.deleteType,
+      type: "delete",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (data, textStatus, jQxhr) {
+        console.log(data);
+      },
+      error: function (jqXhr, textStatus, errorThrown) {
+        console.log(errorThrown);
+      },
+    }).then(() => {});*/
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     deleteFile();
-
-    fakeRequest().then(() => {
-      props.close();
-    });
   };
   //("https://do4t98vdpdesj.cloudfront.net/");
   return (
